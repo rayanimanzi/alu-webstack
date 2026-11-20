@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Displays the DNS record type and destination of a domain's subdomains
+# shellcheck disable=SC2086
+
+audit_subdomain() {
+    dig "$2.$1" | grep -A1 'ANSWER SECTION:' | tail -n 1 | \
+        awk -v sub_name="$2" '{print "The subdomain " sub_name " is a " $4 " record and points to " $5}'
+}
+
+if [ "$#" -eq 1 ]; then
+    for sub in www lb-01 web-01 web-02; do
+        audit_subdomain "$1" "$sub"
+    done
+else
+    audit_subdomain "$1" "$2"
+fi
